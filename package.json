@@ -1,0 +1,17 @@
+{
+  "name": "telegrambot",
+  "version": "1.0.0",
+  "description": "compliments for my girl",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "ilyaIvanchikov96@mail.ru",
+  "license": "ISC",
+  "dependencies": {
+    "firebase-admin": "^9.11.1",
+    "node-telegram-bot-api": "^0.54.0",
+    "nodemon": "^2.0.12"
+  }
+}

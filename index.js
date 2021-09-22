@@ -12,17 +12,13 @@ admin.initializeApp({
 });
 const db = admin.database();
 
-// const userRef=db.ref("telegramfamilybot-569a3-default-rtdb");
-db.ref('customPath').set({ test: 'test' }, function (error) {
-    if (error) {
-        // The write failed...
-        console.log('Failed with error: ' + error);
-    } else {
-        // The write was successful...
-        console.log('success');
-    }
-});
-// console.log(userRef)
+const ref = db.ref('fds');
+ref.on('value', (snapshot) => {
+    console.log(snapshot.val());
+  }, (errorObject) => {
+    console.log('The read failed: ' + errorObject.name);
+  }); 
+
 const bot = new TelegramApi(token, {
     polling: true,
 });

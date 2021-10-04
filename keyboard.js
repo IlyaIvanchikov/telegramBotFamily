@@ -9,5 +9,12 @@ module.exports = {
                 [{text: 'Просмотреть заявки на покупку', callback_data: 'show_dreams'}],
             ]
         })
-    }
+    },
+    // hideMenu: {
+    //     reply_markup: JSON.stringify({
+    //         inline_keyboard: [
+    //             [{text: 'Добавить комплимент', callback_data: 'addCompliment'}],
+    //         ]
+    //     })
+    // }
 }

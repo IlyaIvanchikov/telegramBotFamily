@@ -1,31 +1,18 @@
-const { token } = require('./constants');
+const { token, MY_ID } = require('./constants');
 const { start } = require('./text');
 const { turtleWithHeart } = require('./stickers');
-const { husbandMenu } = require('./keyboard');
+const { husbandMenu, hideMenu } = require('./keyboard');
 const TelegramApi = require('node-telegram-bot-api');
-var serviceAccount = require('./key.json');
-var admin = require('firebase-admin');
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://telegramfamilybot-569a3-default-rtdb.firebaseio.com/',
-});
-const db = admin.database();
-
-const ref = db.ref('fds');
-ref.on('value', (snapshot) => {
-    console.log(snapshot.val());
-  }, (errorObject) => {
-    console.log('The read failed: ' + errorObject.name);
-  }); 
-
+const { addCompliment, getCompliment } = require('./service/compliments');
 const bot = new TelegramApi(token, {
     polling: true,
 });
 
+
 bot.setMyCommands([
     { command: '/start', description: 'Приветствие' },
     { command: '/husband', description: 'Меню' },
+    // { command: '/husband', description: 'Меню' },
 ]);
 
 const startHusband = async (chat_id) => {
@@ -36,18 +23,46 @@ const startHusband = async (chat_id) => {
     await bot.sendMessage(chat_id, 'Выбирай', husbandMenu);
 };
 
+// const startHideMenu = async (chat_id) => {
+//     await bot.sendMessage(chat_id, 'Выбирай', hideMenu);
+// };
+
+bot.on('callback_query', async (query) => {
+    const chat_id = query.message.chat.id;
+    try {
+        if (query.data === 'compliment') {
+            const compliment = await getCompliment();
+            return bot.sendMessage(chat_id, compliment);
+        }
+
+        if (query.data === 'addCompliment') {
+            return bot.sendMessage(chat_id, 'Введите ваш комплимент');
+        }
+    } catch (e) {
+        return bot.sendMessage(chat_id, 'Произошла какая то ошибочка!)');
+    }
+});
+
 bot.on('message', async (msg) => {
     const text = msg.text;
     const chat_id = msg.chat.id;
     try {
+        if (text === '/husband') {
+            return startHusband(chat_id);
+        }
+
+        if (msg.from.id === MY_ID) {
+            await addCompliment(msg.text);
+            return bot.sendMessage(chat_id, 'Добавлено');
+        }
         if (text === '/start') {
             await bot.sendSticker(chat_id, turtleWithHeart);
             return bot.sendMessage(chat_id, start, { parse_mode: 'Markdown' });
         }
 
-        if (text === '/husband') {
-            return startHusband(chat_id);
-        }
+        // if (text === 'скрытые возможности') {
+        //     return startHideMenu(chat_id);
+        // }
 
         if (text === 'Я очень люблю своего мужа') {
             return startHusband(chat_id);
